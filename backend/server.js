@@ -35,4 +35,3 @@ mongoose.connect(mongo_url)
     .catch((error)=>{
         console.log(error.message)
     })
-
