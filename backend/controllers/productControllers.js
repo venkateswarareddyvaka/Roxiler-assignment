@@ -18,50 +18,76 @@ const insertingData = async (req,res)=>{
     }
 }
 
+// const getTransactions = async (req, res) => {
+//     try {
+//       const { page = 1, perPage = 10, search = '', month } = req.query;
+  
+//       const searchQuery = {
+//         $or: [
+//           { productTitle: { $regex: search, $options: 'i' } },
+//           { description: { $regex: search, $options: 'i' } },
+//         ]
+//       };
+  
+//       // Add condition to search by month if provided
+//       if (month) {
+//         // Extract the numeric value of the month (1 for January, 2 for February, etc.)
+//         const monthNumber = parseInt(month, 10);
+//         // Construct query to search by month
+//         searchQuery.dateOfSale = {
+//           $gte: new Date(`${monthNumber}-01`),
+//           $lt: new Date(`${monthNumber + 1}-01`)
+//         };
+//       }
+  
+//       // If search is a number, add it to the query for the price field
+//       if (!isNaN(search)) {
+//         searchQuery.$or.push({ price: Number(search) });
+//       }
+  
+//       const transactions = await Product.find(search ? searchQuery : {})
+//         .skip((page - 1) * perPage)
+//         .limit(Number(perPage));
+  
+//       const totalTransactions = await Product.countDocuments(search ? searchQuery : {});
+  
+//       res.json({
+//         transactions,
+//         totalTransactions,
+//         currentPage: Number(page),
+//         totalPages: Math.ceil(totalTransactions / perPage)
+//       });
+//     } catch (error) {
+//       res.status(500).json({ message: error.message });
+//     }
+//   };
+  
+
 const getTransactions = async (req, res) => {
     try {
-      const { page = 1, perPage = 10, search = '', month } = req.query;
-  
-      const searchQuery = {
-        $or: [
-          { productTitle: { $regex: search, $options: 'i' } },
-          { description: { $regex: search, $options: 'i' } },
-        ]
-      };
-  
-      // Add condition to search by month if provided
-      if (month) {
-        // Extract the numeric value of the month (1 for January, 2 for February, etc.)
+        const { month } = req.query;
+
+        if (!month) {
+            return res.status(400).json({ message: 'Month parameter is required' });
+        }
+
         const monthNumber = parseInt(month, 10);
-        // Construct query to search by month
-        searchQuery.dateOfSale = {
-          $gte: new Date(`${monthNumber}-01`),
-          $lt: new Date(`${monthNumber + 1}-01`)
-        };
-      }
-  
-      // If search is a number, add it to the query for the price field
-      if (!isNaN(search)) {
-        searchQuery.$or.push({ price: Number(search) });
-      }
-  
-      const transactions = await Product.find(search ? searchQuery : {})
-        .skip((page - 1) * perPage)
-        .limit(Number(perPage));
-  
-      const totalTransactions = await Product.countDocuments(search ? searchQuery : {});
-  
-      res.json({
-        transactions,
-        totalTransactions,
-        currentPage: Number(page),
-        totalPages: Math.ceil(totalTransactions / perPage)
-      });
+
+        const transactions = await Product.find({
+            $expr: {
+                $eq: [{ $month: '$dateOfSale' }, monthNumber]
+            }
+        });
+
+        res.json({
+            transactions
+        });
     } catch (error) {
-      res.status(500).json({ message: error.message });
+        res.status(500).json({ message: error.message });
     }
-  };
-  
+};
+
+
 
 const getStatistics = async (req, res) => {
     try {
