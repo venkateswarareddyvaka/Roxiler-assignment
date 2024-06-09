@@ -19,7 +19,7 @@ app.use(cors());
 
 app.use('/api/transactions', transactionRoutes);
 app.use('/api/statistics', statisticsRoutes);
-app.use('/api/statistics', barChartRoutes);
+app.use('/api/batcharts', barChartRoutes);
 
 app.get('/',insertingData)
 

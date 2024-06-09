@@ -1,16 +1,16 @@
 {
+    "name": "your-project-name",
     "version": 2,
     "builds": [
-      {
-        "src": "index.js",
-        "use": "@vercel/node"
-      }
+      { 
+        "src": "server.js", 
+        "use": "@vercel/node" }
     ],
     "routes": [
-      {
-        "src": "/(.*)",
-        "dest": "/index.js"
-      }
+      { "src": "/(.*)", "dest": "/server.js" },
+      { "src": "/api/transactions", "dest": "/server.js" },
+      { "src": "/api/statistics", "dest": "/server.js" },
+      { "src": "/api/batcharts", "dest": "/server.js" }
     ]
-}
+  }
   
