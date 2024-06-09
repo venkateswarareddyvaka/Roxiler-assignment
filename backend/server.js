@@ -1,6 +1,7 @@
 const express = require('express')
 const mongoose = require('mongoose')
 const Product = require('./models/productsModel.js')
+const cors = require('cors');
 const {insertingData} = require('./controllers/productControllers.js')
 const transactionRoutes = require('./routes/productRoutes.js');
 const statisticsRoutes = require('./routes/statisticsRoutes.js');
@@ -14,6 +15,8 @@ const port = process.env.PORT
 const mongo_url = process.env.MONGO_URL
 
 app.use(express.json())
+app.use(cors());
+
 app.use('/api/transactions', transactionRoutes);
 app.use('/api/statistics', statisticsRoutes);
 app.use('/api/statistics', barChartRoutes);
