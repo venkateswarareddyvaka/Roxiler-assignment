@@ -65,17 +65,13 @@ const insertingData = async (req,res)=>{
 
 const getTransactions = async (req, res) => {
     try {
-        const { month, search = '' } = req.query;
+        const { month, search = '', page = 1, perPage = 10 } = req.query;
 
         if (!month) {
             return res.status(400).json({ message: 'Month parameter is required' });
         }
 
-        const monthNumber = parseInt(month, 10);
-
-        if (isNaN(monthNumber) || monthNumber < 1 || monthNumber > 12) {
-            return res.status(400).json({ message: 'Invalid month parameter' });
-        }
+        const monthNumber = new Date(Date.parse(month +" 1, 2021")).getMonth() + 1;
 
         // Construct the search query
         const searchQuery = {
@@ -88,40 +84,40 @@ const getTransactions = async (req, res) => {
             ]
         };
 
-        const searchConditions = [];
-
-        // Add text search conditions for title and description
         if (search) {
-            searchConditions.push({ title: { $regex: search, $options: 'i' } });
-            searchConditions.push({ description: { $regex: search, $options: 'i' } });
+            const searchConditions = [
+                { title: { $regex: search, $options: 'i' } },
+                { description: { $regex: search, $options: 'i' } }
+            ];
 
             // If search is a number, add it to the query for the price field
-            if (!isNaN(Number(search))) {
+            if (!isNaN(search)) {
                 searchConditions.push({ price: Number(search) });
             }
+
+            searchQuery.$and.push({ $or: searchConditions });
         }
 
-        // Add the search conditions to the query if there are any
-        if (searchConditions.length > 0) {
-            searchQuery.$and.push({
-                $or: searchConditions
-            });
-        }
+        const skip = (page - 1) * perPage;
+        const limit = parseInt(perPage, 10);
 
-        console.log('Constructed Query:', JSON.stringify(searchQuery, null, 2));
+        const transactions = await Product.find(searchQuery)
+            .skip(skip)
+            .limit(limit);
 
-        const transactions = await Product.find(searchQuery);
-
-        console.log('Found Transactions:', transactions);
+        const totalTransactions = await Product.countDocuments(searchQuery);
 
         res.json({
-            transactions
+            transactions,
+            totalTransactions,
+            currentPage: Number(page),
+            totalPages: Math.ceil(totalTransactions / perPage)
         });
     } catch (error) {
-        console.error('Error fetching transactions:', error);
         res.status(500).json({ message: error.message });
     }
 };
+
 
 
 const getStatistics = async (req, res) => {
