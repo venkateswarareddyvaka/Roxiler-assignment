@@ -65,7 +65,7 @@ const insertingData = async (req,res)=>{
 
 const getTransactions = async (req, res) => {
     try {
-        const { month } = req.query;
+        const { month, search = '' } = req.query;
 
         if (!month) {
             return res.status(400).json({ message: 'Month parameter is required' });
@@ -73,20 +73,55 @@ const getTransactions = async (req, res) => {
 
         const monthNumber = parseInt(month, 10);
 
-        const transactions = await Product.find({
-            $expr: {
-                $eq: [{ $month: '$dateOfSale' }, monthNumber]
+        if (isNaN(monthNumber) || monthNumber < 1 || monthNumber > 12) {
+            return res.status(400).json({ message: 'Invalid month parameter' });
+        }
+
+        // Construct the search query
+        const searchQuery = {
+            $and: [
+                {
+                    $expr: {
+                        $eq: [{ $month: '$dateOfSale' }, monthNumber]
+                    }
+                }
+            ]
+        };
+
+        const searchConditions = [];
+
+        // Add text search conditions for title and description
+        if (search) {
+            searchConditions.push({ title: { $regex: search, $options: 'i' } });
+            searchConditions.push({ description: { $regex: search, $options: 'i' } });
+
+            // If search is a number, add it to the query for the price field
+            if (!isNaN(Number(search))) {
+                searchConditions.push({ price: Number(search) });
             }
-        });
+        }
+
+        // Add the search conditions to the query if there are any
+        if (searchConditions.length > 0) {
+            searchQuery.$and.push({
+                $or: searchConditions
+            });
+        }
+
+        console.log('Constructed Query:', JSON.stringify(searchQuery, null, 2));
+
+        const transactions = await Product.find(searchQuery);
+
+        console.log('Found Transactions:', transactions);
 
         res.json({
             transactions
         });
     } catch (error) {
+        console.error('Error fetching transactions:', error);
         res.status(500).json({ message: error.message });
     }
 };
-
 
 
 const getStatistics = async (req, res) => {
