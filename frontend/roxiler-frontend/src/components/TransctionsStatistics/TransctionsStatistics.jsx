@@ -21,17 +21,14 @@ const TransctionsStatistics = ({ selectedMonth }) => {
     }, [selectedMonth]);
 
     // Function to get month name from month number
-    const getMonthName = (monthNumber) => {
-        const monthNames = [
-            'January', 'February', 'March', 'April', 'May', 'June',
-            'July', 'August', 'September', 'October', 'November', 'December'
-        ];
-        return monthNames[monthNumber - 1];
-    };
-
+    const monthNames = [
+        'January', 'February', 'March', 'April', 'May', 'June',
+        'July', 'August', 'September', 'October', 'November', 'December'
+    ];
+        
     return (
         <div className='statisticsContainer'>
-            <h1>{`Statistics - ${data ? getMonthName(selectedMonth) : 'Loading...'}`}</h1>
+            <h1>{`Statistics - ${monthNames[monthsArray.indexOf(selectedMonth)]}`}</h1>
             <div>
                 <p>{`Total sale           ${data ? data.totalSaleAmount : 'Loading...'}`}</p>
                 <p>{`Total sold items   ${data ? data.totalSoldItems : 'Loading...'}`}</p>
