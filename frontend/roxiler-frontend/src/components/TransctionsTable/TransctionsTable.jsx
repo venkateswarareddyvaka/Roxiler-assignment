@@ -18,7 +18,7 @@ const TransctionsTable = () => {
       setLoading(true);
       setError(null);
       const response = await fetch(
-        `http://localhost:3001/api/transactions?month=${monthsArray.indexOf(month) + 1}&search=${search}&page=${page}&perPage=${perPage}`
+        `https://roxiler-assignment-apis.vercel.app/api/transactions?month=${monthsArray.indexOf(month) + 1}&search=${search}&page=${page}&perPage=${perPage}`
       );
       const data = await response.json();
       setTransactions(data.transactions || []);
