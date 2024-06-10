@@ -3,8 +3,7 @@ import './TransctionsTable.css';
 
 const monthsArray = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
-const TransctionsTable = () => {
-  const [selectedMonth, setSelectedMonth] = useState('Mar');
+const TransctionsTable = ({selectedMonth,onMonthChange}) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -35,8 +34,8 @@ const TransctionsTable = () => {
   }, [selectedMonth, searchQuery, currentPage]);
 
   const handleMonthChange = (e) => {
+    onMonthChange(e.target.value)
     setTransactions([])
-    setSelectedMonth(e.target.value);
     setCurrentPage(1); // Reset to first page on month change
   };
 
