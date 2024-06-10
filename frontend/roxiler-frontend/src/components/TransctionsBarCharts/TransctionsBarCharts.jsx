@@ -13,7 +13,7 @@ const TransactionsBarCharts = ({ selectedMonth }) => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axios.get(`https://roxiler-assignment-apis.vercel.app/api/batcharts?month=${monthsArray.indexOf(selectedMonth) + 1}`);
+                const response = await axios.get(`https://roxiler-assignment-apis.vercel.app/api/barcharts?month=${monthsArray.indexOf(selectedMonth) + 1}`);
                 setData(response.data);
 
                 const soldItemsCount = response.data.reduce((total, item) => total + item.count, 0);
