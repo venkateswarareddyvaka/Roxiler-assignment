@@ -35,6 +35,7 @@ const TransctionsTable = () => {
   }, [selectedMonth, searchQuery, currentPage]);
 
   const handleMonthChange = (e) => {
+    setTransactions([])
     setSelectedMonth(e.target.value);
     setCurrentPage(1); // Reset to first page on month change
   };
